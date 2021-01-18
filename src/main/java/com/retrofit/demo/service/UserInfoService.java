@@ -12,6 +12,6 @@ import java.io.IOException;
 @Service
 public class UserInfoService {
     public Result<Object> getUserInfo(String id) {
-        return Result.builder().code(0).msg("success").data(User.builder().age(99).gender("male").id("0001").name("alex").build()).build();
+        return Result.builder().code(0).msg("success").data(User.builder().id(id).age(99).gender("male").id("0001").name("alex").build()).build();
     }
 }

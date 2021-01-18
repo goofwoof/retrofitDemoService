@@ -31,5 +31,10 @@ public class UserInfoAPI {
         return userInfoService.getUserInfo(id);
     }
 
+    @RequestMapping(value = "/getUserDegrade", method = {RequestMethod.POST, RequestMethod.GET})
+    public Object getUserDegrade(@RequestParam String id) throws Exception {
+        return userInfoService.getUserInfo(id);
+    }
+
 
 }
