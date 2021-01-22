@@ -1,4 +1,0 @@
-server:
-  port: 6443
-  servlet:
-    context-path: /apiService
