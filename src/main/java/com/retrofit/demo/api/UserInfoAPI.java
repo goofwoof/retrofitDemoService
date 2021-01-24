@@ -1,8 +1,9 @@
 package com.retrofit.demo.api;
 
-import com.retrofit.demo.service.responseEntity.Result;
+
 import com.retrofit.demo.service.UserInfoService;
 import com.retrofit.demo.service.responseEntity.ResultEmpty;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -58,7 +58,7 @@ public class UserInfoAPI {
         String filePath = System.getProperty("user.dir").concat("/workspace/temp/");
         File dest = new File(new File(filePath).getAbsolutePath()+ "/" + fileName);
         try {
-            file.transferTo(dest);
+            FileUtils.copyInputStreamToFile(file.getInputStream(), dest);
             LOGGER.info("上传成功");
             return ResultEmpty.builder().code(0).msg("success").build();
         } catch (IOException e) {
@@ -71,7 +71,7 @@ public class UserInfoAPI {
     @ResponseBody
     public Object multiUpload(MultipartHttpServletRequest request) {
         List<MultipartFile> files = request.getFiles("file");
-        String filePath = System.getProperty("user.dir").concat("workspace/temp/");
+        String filePath = System.getProperty("user.dir").concat("/workspace/temp/");
         createDir(filePath);
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
@@ -82,7 +82,7 @@ public class UserInfoAPI {
 
             File dest = new File(filePath + fileName);
             try {
-                file.transferTo(dest);
+                FileUtils.copyInputStreamToFile(file.getInputStream(), dest);
                 LOGGER.info("第" + (i + 1) + "个文件上传成功");
             } catch (IOException e) {
                 LOGGER.error(e.toString(), e);
