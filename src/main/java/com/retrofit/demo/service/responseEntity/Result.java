@@ -18,8 +18,7 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Result<T> implements Serializable {
-    private static final long serialVersionUID = -504027247149928390L;
+public class Result<T>{
     private int code;
     private String msg;
     private T data;

@@ -2,18 +2,20 @@ package com.retrofit.demo.api;
 
 
 import com.retrofit.demo.service.UserInfoService;
+import com.retrofit.demo.service.responseEntity.Result;
 import com.retrofit.demo.service.responseEntity.ResultEmpty;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.File;
-import java.io.IOException;
+import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotEmpty;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -56,7 +58,7 @@ public class UserInfoAPI {
 
         String fileName = file.getOriginalFilename();
         String filePath = System.getProperty("user.dir").concat("/workspace/temp/");
-        File dest = new File(new File(filePath).getAbsolutePath()+ "/" + fileName);
+        File dest = new File(filePath + "/" + fileName);
         try {
             FileUtils.copyInputStreamToFile(file.getInputStream(), dest);
             LOGGER.info("上传成功");
@@ -72,7 +74,6 @@ public class UserInfoAPI {
     public Object multiUpload(MultipartHttpServletRequest request) {
         List<MultipartFile> files = request.getFiles("file");
         String filePath = System.getProperty("user.dir").concat("/workspace/temp/");
-        createDir(filePath);
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
             if (file.isEmpty()) {
@@ -92,14 +93,29 @@ public class UserInfoAPI {
         return ResultEmpty.builder().code(0).msg("success").build();
     }
 
-    private boolean createDir(String path) {
-        Assert.isTrue(path.endsWith("/"), "path should be a directory");
-        File file=new File(path);
-        // 如果文件夹不存在
-        if(!file.exists()) {
-            // 创建文件夹
-            return file.mkdir();
+    @RequestMapping(value = "/download", method = {RequestMethod.POST, RequestMethod.GET})
+    public Object download(@RequestParam("file") @NotEmpty String fileName, HttpServletResponse response) throws Exception {
+        String filePath = System.getProperty("user.dir").concat("/workspace/temp/");
+        File file = new File(filePath, fileName);
+        if(!file.exists()){
+            return Result.builder().code(9299399).msg("file not found").build();
         }
-        return false;
+        response.reset();
+        response.setContentType(new MimetypesFileTypeMap().getContentType(file));
+        response.setContentLength((int) file.length());
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+        try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));) {
+            byte[] buff = new byte[1024];
+            OutputStream os  = response.getOutputStream();
+            int i = 0;
+            while ((i = bis.read(buff)) != -1) {
+                os.write(buff, 0, i);
+                os.flush();
+            }
+        } catch (IOException e) {
+            return Result.builder().code(9299398).msg("fail download file").build();
+        }
+        return null;
     }
 }
