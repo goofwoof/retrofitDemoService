@@ -8,14 +8,25 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -30,8 +41,17 @@ public class UserInfoAPI {
     private static int time_error = 1;
 
     @RequestMapping(value = "/getUserInfo", method = {RequestMethod.POST, RequestMethod.GET})
-    public Object getUserInfo(@RequestParam String id) throws Exception {
+    public Object getUserInfo(@RequestParam String id, HttpServletRequest request) {
+        LOGGER.info(" info for headers {}", wrapHeaders(request.getHeaderNames()));
         return userInfoService.getUserInfo(id);
+    }
+
+    private String wrapHeaders(Enumeration<String> headerNames) {
+        StringBuilder s = new StringBuilder();
+        while (headerNames.hasMoreElements()) {
+            s.append(headerNames.nextElement()).append("||");
+        }
+        return s.toString();
     }
 
     @RequestMapping(value = "/getUserInfoRetry", method = {RequestMethod.POST, RequestMethod.GET})
