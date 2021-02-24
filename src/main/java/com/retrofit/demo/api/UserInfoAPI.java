@@ -8,12 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -52,6 +47,12 @@ public class UserInfoAPI {
             s.append(headerNames.nextElement()).append("||");
         }
         return s.toString();
+    }
+
+    @RequestMapping(value = "/deleteUser/{id}", method = {RequestMethod.DELETE})
+    public Object deleteUser(@PathVariable String id, HttpServletRequest request) {
+        LOGGER.info(" info for PathVariable {}", id);
+        return userInfoService.getUserInfo(id);
     }
 
     @RequestMapping(value = "/getUserInfoRetry", method = {RequestMethod.POST, RequestMethod.GET})
