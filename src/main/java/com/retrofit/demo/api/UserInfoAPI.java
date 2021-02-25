@@ -1,6 +1,7 @@
 package com.retrofit.demo.api;
 
 
+import com.retrofit.demo.request.QueryReq;
 import com.retrofit.demo.service.UserInfoService;
 import com.retrofit.demo.service.responseEntity.Result;
 import com.retrofit.demo.service.responseEntity.ResultEmpty;
@@ -35,10 +36,16 @@ public class UserInfoAPI {
     private UserInfoService userInfoService;
     private static int time_error = 1;
 
-    @RequestMapping(value = "/getUserInfo", method = {RequestMethod.POST, RequestMethod.GET})
+    @RequestMapping(value = "/getUserInfo", method = RequestMethod.GET)
     public Object getUserInfo(@RequestParam String id, HttpServletRequest request) {
         LOGGER.info(" info for headers {}", wrapHeaders(request.getHeaderNames()));
         return userInfoService.getUserInfo(id);
+    }
+
+    @RequestMapping(value = "/getUserInfo", method = RequestMethod.POST)
+    public Object getUserInfoPost(@RequestBody QueryReq req, HttpServletRequest request) {
+        LOGGER.info(" info for headers {}", wrapHeaders(request.getHeaderNames()));
+        return userInfoService.getUserInfo(req.getId());
     }
 
     private String wrapHeaders(Enumeration<String> headerNames) {
